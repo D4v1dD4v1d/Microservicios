@@ -19,8 +19,8 @@ public class CitaMapper implements CommonMapper<CitaRequest, Cita, CitaResponse>
                 : Cita.crear(
                         request.idPaciente(),
                         request.idMedico(),
-                        request.fechaCita(),
-                        request.sintomas());
+                        request.sintomas(),
+                        request.fechaCita());
     }
 
     @Override
@@ -34,6 +34,18 @@ public class CitaMapper implements CommonMapper<CitaRequest, Cita, CitaResponse>
                         entidad.getFechaCita(),
                         entidad.getSintomas(),
                         entidad.getEstadoCita().getDescripcion());
+    }
+
+    public CitaResponse entidadAResponse(Cita entidad, PacienteResponse paciente, MedicoResponse medico) {
+        return entidad == null
+                ? null
+                : new CitaResponse(
+                entidad.getId(),
+                pacienteResponseADatosPaciente(paciente),
+                medicoResponseADatosMedico(medico),
+                entidad.getFechaCita(),
+                entidad.getSintomas(),
+                entidad.getEstadoCita().getDescripcion());
     }
 
     private DatosPaciente pacienteResponseADatosPaciente(PacienteResponse paciente){

@@ -49,7 +49,7 @@ public record PacienteRequest(
         @Schema(description = "Número telefónico de contacto. Debe contener exactamente 10 digitos.",
                 example = "2222356486", pattern = "^[0-9]{10}$")
         @NotBlank(message = "El teléfono es requerido")
-        @Pattern(regexp = "[0-9](10)$", message = "El teléfono debe contener solo 10 digitos numéricos")
+        @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe contener solo 10 digitos numéricos")
         String telefono,
 
         @Schema(description = "Dirección de vivienda del paciente",
