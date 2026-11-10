@@ -6,6 +6,7 @@ import com.david.citas.service.CitaService;
 import com.david.commons.controller.CrudController;
 import com.david.commons.docs.ProblemaDoc;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +35,18 @@ public class CitaController extends CrudController<CitaRequest, CitaResponse, Ci
             @PathVariable @Positive(message = "El idEstado debe ser positivo") Long idEstado
     ) {
         service.actualizarEstadoCita(idCita,idEstado);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponse(responseCode = "204", description = "El médico no tiene citas asignadas")
+    @ApiResponse(responseCode = "409", description = "Médico tiene citas asignadas y no puede modificar ni eliminar",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    @GetMapping("/id-medico/{idMedico}/citas-asignadas")
+    public ResponseEntity<Void> medicoTieneCitasAsignadas(
+            @Parameter(description = "Id del médico", example = "1")
+            @PathVariable @Positive(message = "El idMedico debe ser positivo") Long idMedico){
+        service.medicoTieneCitasAsignadas(idMedico);
         return ResponseEntity.noContent().build();
     }
 

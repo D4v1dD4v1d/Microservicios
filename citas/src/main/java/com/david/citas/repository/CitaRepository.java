@@ -12,4 +12,11 @@ import java.util.List;
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByEstadoRegistro(EstadoRegistro estadoRegistro);
+
+    /*
+    * SELECT COUNT(*) FROM CITAS WHERE ID_MEDICO = ? AND
+    *           ESTADO_REGISTRO = ? AND ESTADO_CITA IN(?)
+    * */
+    boolean existsByIdMedicoAndEstadoRegistroAndEstadoCitaIn(
+            Long idMedico, EstadoRegistro estadoRegistro, List<EstadoCita> estadoCitas);
 }

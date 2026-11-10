@@ -23,4 +23,6 @@ public interface CitaService extends CrudService<CitaRequest, CitaResponse> {
     void eliminar(Long id);
 
     void actualizarEstadoCita(Long idCita, Long idEstado);
+
+    void medicoTieneCitasAsignadas(Long idMedico);
 }
