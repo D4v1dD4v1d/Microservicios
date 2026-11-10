@@ -1,5 +1,6 @@
 package com.david.medicos.service;
 
+import com.david.commons.clients.CitaClient;
 import com.david.commons.dto.medicos.MedicoRequest;
 import com.david.commons.dto.medicos.MedicoResponse;
 import com.david.commons.enums.DisponibilidadMedico;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MedicoServiceImpl implements MedicoService{
     private final MedicoRepository medicoRepository;
+    private final CitaClient citaClient;
 
     private final MedicoMapper medicoMapper;
 
@@ -95,6 +97,8 @@ public class MedicoServiceImpl implements MedicoService{
     public MedicoResponse actualizar(MedicoRequest request, Long id) {
         Medico medico =obtenerMedicoActivoPorId(id);
 
+        validarMedicoTieneCitasAgendadas(id);
+
         validarCambiosUnicos(request,id);
 
         log.info("Actualizando médico con id: {}", id);
@@ -121,6 +125,8 @@ public class MedicoServiceImpl implements MedicoService{
         Medico medico = obtenerMedicoActivoPorId(id);
 
         log.info("Eliminando al médico {}", medico.obtenerNombreCompleto());
+
+        validarMedicoTieneCitasAgendadas(id);
 
         medico.eliminar();
 
@@ -168,5 +174,11 @@ public class MedicoServiceImpl implements MedicoService{
 
         if (medicoRepository.existsByCedulaProfesionalIgnoreCaseAndEstadoRegistroAndIdNot(request.cedulaProfesional().trim(), EstadoRegistro.ACTIVO, id))
             throw new ConflictoException("Ya existe un médico activo registrado con la cédula: " + request.cedulaProfesional());
+    }
+    private void validarMedicoTieneCitasAgendadas(Long idMedico){
+
+        log.info("Validando si el médico con id {} tiene citas agregadas en servicio remoto...", idMedico);
+
+        citaClient.medicoTieneCitasAsignadas(idMedico);
     }
 }
