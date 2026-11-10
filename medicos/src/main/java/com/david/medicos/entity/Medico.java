@@ -1,0 +1,151 @@
+package com.david.medicos.entity;
+
+import com.david.commons.enums.DisponibilidadMedico;
+import com.david.commons.enums.EspecialidadMedico;
+import com.david.commons.enums.EstadoRegistro;
+import com.david.commons.exceptions.ConflictoException;
+import com.david.commons.exceptions.DatoInvalidoException;
+import com.david.commons.utils.StringCustomUtils;
+import com.david.commons.utils.ValoresNumericosUtils;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "MEDICOS")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+public class Medico {
+    @Id
+    @GeneratedValue(strategy = GenerationType. IDENTITY)
+    @Column(name = "ID_MEDICO")
+    private Long id;
+
+    @Column (name = "NOMBRE", length = 50, nullable = false)
+    private String nombre;
+
+    @Column (name = "APELLIDO_PATERNO", length = 50, nullable = false)
+    private String apellidoPaterno;
+
+    @Column (name = "APELLIDO_MATERNO", length = 50, nullable = false)
+    private String apellidoMaterno;
+
+    @Column(name = "EDAD", nullable = false)
+    private Short edad;
+
+    @Column(name = "EMAIL", length = 100, nullable = false)
+    private  String email;
+
+    @Column (name = "TELEFONO", length = 10, nullable = false)
+    private String telefono;
+
+    @Column (name = "CEDULA_PROFESIONAL", length = 12, nullable = false)
+    private String cedulaProfesional;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ESPECIALIDAD",nullable = false)
+    private EspecialidadMedico especialidad;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "DISPONIBILIDAD",nullable = false)
+    private DisponibilidadMedico disponibilidad;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ESTADO_REGISTRO",nullable = false)
+    private EstadoRegistro estadoRegistro;
+
+
+    public static void validarDatos(String nombre,String apelldioPaterno, String apellidoMaterno,Short edad, String email,
+                                    String telefono, String cedulaProfesional){
+        StringCustomUtils.validarTamanio(nombre,1,50,
+                "El nombre es requerido y debe contener entre 1 y 50 caracteres");
+        StringCustomUtils.validarTamanio(apelldioPaterno,1,50,
+                "El apellido paterno es requerido y debe contener entre 1 y 50 caracteres");
+        StringCustomUtils.validarTamanio(apellidoMaterno,1,50,
+                "El apellido materno es requerido y debe contener entre 1 y 50 caracteres");
+        StringCustomUtils.validarTamanio(email,1,50,
+                "El email es requerido y debe contener entre 1 y 50 caracteres");
+        StringCustomUtils.validarTamanio(telefono,10,10,
+                "El teléfono es requerido y debe contener exactamente 10 dígitos");
+        StringCustomUtils.validarTamanio(cedulaProfesional,12,12,
+                "La cédula es requerida y debe contener exactamente 12 dígitos");
+        ValoresNumericosUtils.validadRangoShort(edad,(short)18,(short)100,
+                "La edad es requerida y debe tener entre 18 y 100 años");
+    }
+
+    private void validarNoEliminado(){
+        if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
+            throw new ConflictoException("El médico ya está eliminado");
+    }
+
+    public void eliminar(){
+        validarNoEliminado();
+        this.estadoRegistro = EstadoRegistro.ELIMINADO;
+    }
+
+    public void actualizarEspecialidad(EspecialidadMedico especialidad){
+        validarNoEliminado();
+        if(especialidad == null)
+            throw new DatoInvalidoException("La especialidad es requerida");
+        this.especialidad = especialidad;
+    }
+
+    public void actualizarDisponibilidad(DisponibilidadMedico disponibilidad){
+        validarNoEliminado();
+        if(disponibilidad == null)
+            throw new DatoInvalidoException("La disponibilidad es requerida");
+
+        this.disponibilidad =disponibilidad;
+
+    }
+
+    public String obtenerNombreCompleto(){
+        return String.join(" ",
+                this.getNombre(),
+                this.getApellidoPaterno(),
+                this.getApellidoMaterno());
+    }
+
+    public void actualizar(String nombre, String apellidoPaterno, String apellidoMaterno,
+                           Short edad, String email, String telefono,
+                           String cedulaProfesional, EspecialidadMedico especialidad){
+        validarNoEliminado();
+
+        validarDatos(nombre,apellidoPaterno,apellidoMaterno,edad,email,telefono,cedulaProfesional);
+
+        actualizarEspecialidad(especialidad);
+
+        this.nombre = nombre;
+        this.apellidoPaterno=apellidoPaterno;
+        this.apellidoMaterno=apellidoMaterno;
+        this.edad=edad;
+        this.email= email;
+        this.telefono= telefono;
+        this.cedulaProfesional=cedulaProfesional;
+
+    }
+
+
+
+    public static Medico crear(String nombre, String apellidoPaterno, String apellidoMaterno,
+                           Short edad, String email, String telefono,String cedulaProfesional){
+
+        validarDatos(nombre,apellidoPaterno,apellidoMaterno,edad,email,telefono,cedulaProfesional);
+
+        return Medico.builder()
+                .nombre(nombre.trim())
+                .apellidoPaterno(apellidoPaterno.trim())
+                .apellidoMaterno(apellidoMaterno.trim())
+                .edad(edad)
+                .email(email.trim())
+                .telefono(telefono.trim())
+                .cedulaProfesional(cedulaProfesional.trim())
+                .disponibilidad(DisponibilidadMedico.DISPONIBLE)
+                .estadoRegistro(EstadoRegistro.ACTIVO)
+                .build();
+    }
+
+}
