@@ -8,8 +8,9 @@ spring:
     gateway:
       server:
         webflux:
+          x-forwarded:
+            prefix-enabeled: true
           routes:
-            # ---------- RUTA 2 (opcional): hacia servicio-b ----------
             - id: ruta-medicos
               uri: lb://medicos
               predicates:
@@ -30,7 +31,8 @@ spring:
                 - Path=/api/pacientes/**
               filters:
                 - StripPrefix=2
-
+    loadbalancer:
+      enabeled: true
 eureka:
   client:
     service-url:

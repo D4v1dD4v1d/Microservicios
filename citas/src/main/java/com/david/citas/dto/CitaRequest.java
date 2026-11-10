@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 @Schema(description = "Datos necesarios para registrar o actualizar una cita")
 public record CitaRequest(
         @Schema(description = "Identificador del paciente", example = "1")
-        @NotBlank(message = "El id de paciente es requerido")
+        @NotNull(message = "El id de paciente es requerido")
         @Positive(message = "El id del paciente debe ser positivo")
         Long idPaciente,
 
         @Schema(description = "Identificador del médico", example = "1")
-        @NotBlank(message = "El id de médico es requerido")
+        @NotNull(message = "El id de médico es requerido")
         @Positive(message = "El id del médico debe ser positivo")
         Long idMedico,
 
@@ -26,7 +26,7 @@ public record CitaRequest(
         @NotNull(message = "La fecha de la cita es requerido")
         @FutureOrPresent(message = "La fecha de la cita debe ser futura")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
-        String fechaCita,
+        LocalDateTime fechaCita,
 
         @Schema(
                 description = "Descripción de los síntomas que presenta el paciente",
@@ -35,5 +35,5 @@ public record CitaRequest(
                 maxLength = 500)
         @NotBlank(message = "Los síntomas son requeridos")
         @Size(min = 20, max = 500, message = "La descripción de los síntomas debe tener entre 20 y 500 caracteres")
-        LocalDateTime sintomas
+        String sintomas
 ) {}
