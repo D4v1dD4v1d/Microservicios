@@ -81,7 +81,8 @@ public class Paciente {
         StringCustomUtils.validarTamanio(direccion,1,150,
                 "La dirección es requerida y debe contener entre 10 y 150 carácteres");
 
-
+        if(calcularImc(peso, estatura)>50 || calcularImc(peso, estatura)<10)
+            throw new ConflictoException("No seas perro no puede medir y pesar eso ;)");
 
         ValoresNumericosUtils.validadRangoShort(edad,(short)1,(short)100,
                 "La edad es requerida y debe tener entre 1 y 100 años");
@@ -111,13 +112,7 @@ public class Paciente {
     }
 
     private static Double calcularImc (Double peso, Double estatura){
-        Double imc;
-        try {
-            imc = peso/(Math.pow(estatura,2));
-        }catch (Exception e){
-            throw new ConflictoException("No seas perro no puede medir y pesar eso ;)");
-        }
-        return imc;
+         return peso/(Math.pow(estatura,2));
     }
 
     private static String calcularNumeroExpediente(String telefono){
@@ -133,16 +128,22 @@ public class Paciente {
 
         validarDatos(nombre,apellidoPaterno,apellidoMaterno,edad,peso,estatura,email,telefono,direccion);
 
+
+        if(this.peso != peso || this.estatura!= estatura) {
+            this.imc= calcularImc(peso,estatura);
+            this.peso = peso;
+            this.estatura=estatura;
+        }
+        if(this.telefono!=telefono) {
+            this.numExpediente = calcularNumeroExpediente(telefono);
+            this.telefono = telefono;
+        }
+
         this.nombre = nombre;
         this.apellidoPaterno=apellidoPaterno;
         this.apellidoMaterno=apellidoMaterno;
         this.edad=edad;
-        this.peso= peso;
-        this.estatura=estatura;
-        this.imc= calcularImc(peso,estatura);
         this.email= email;
-        this.numExpediente=calcularNumeroExpediente(telefono);
-        this.telefono= telefono;
         this.direccion=direccion;
     }
 
