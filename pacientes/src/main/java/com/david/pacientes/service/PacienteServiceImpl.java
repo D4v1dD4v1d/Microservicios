@@ -1,5 +1,6 @@
 package com.david.pacientes.service;
 
+import com.david.commons.clients.CitaClient;
 import com.david.commons.dto.pacientes.PacienteRequest;
 import com.david.commons.dto.pacientes.PacienteResponse;
 import com.david.commons.enums.EstadoRegistro;
@@ -21,6 +22,7 @@ import java.util.List;
 public class PacienteServiceImpl implements PacienteService{
     private final PacienteRepository pacienteRepository;
     private final PacienteMapper pacienteMapper;
+    private final CitaClient citaClient;
 
 
     @Override
@@ -67,7 +69,11 @@ public class PacienteServiceImpl implements PacienteService{
 
     @Override
     public PacienteResponse actualizar(PacienteRequest request, Long id) {
+
+
         Paciente paciente = obtenerPaciente(id);
+
+        validarPacienteTieneCitasAgendadas(id);
 
         log.info("Actualizando datos de {}...", paciente.obtenerNombreCompleto());
 
@@ -97,7 +103,7 @@ public class PacienteServiceImpl implements PacienteService{
 
         log.info("Eliminando al paciente {}", paciente.obtenerNombreCompleto());
 
-        validarCitas(id);
+        validarPacienteTieneCitasAgendadas(id);
 
         paciente.eliminar();
 
@@ -114,12 +120,12 @@ public class PacienteServiceImpl implements PacienteService{
     }
 
     private void validarDatosUnicos(PacienteRequest request){
-        log.info("Validando email único...");
+        log.info("Validando email único {}...",request.email());
 
         if (pacienteRepository.existsByEmailIgnoreCaseAndEstadoRegistro(request.email(), EstadoRegistro.ACTIVO))
             throw new ConflictoException("Ya existe un paciente activo registrado con el email: " + request.email());
 
-        log.info("Validando télefono único...");
+        log.info("Validando télefono único {}...",request.telefono());
 
         if (pacienteRepository.existsByTelefonoAndEstadoRegistro(request.telefono(), EstadoRegistro.ACTIVO))
             throw new ConflictoException("Ya existe un paciente activo registrado con el télefono: " + request.telefono());
@@ -139,7 +145,14 @@ public class PacienteServiceImpl implements PacienteService{
 
     }
 
-    private void validarCitas(Long id){
+    private void validarPacienteTieneCitasAgendadas(Long idPaciente){
+
+        log.info("Validando si el paciente con id {} tiene citas asignadas en servicio remoto...", idPaciente);
+
+        citaClient.pacienteTieneCitasAsignadas(idPaciente);
+    }
+
+    private void validarCitas(Long idCita){
 
     }
 }

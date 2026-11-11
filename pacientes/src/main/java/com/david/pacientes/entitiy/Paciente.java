@@ -111,8 +111,13 @@ public class Paciente {
     }
 
     private static Double calcularImc (Double peso, Double estatura){
-
-        return peso/(Math.pow(estatura,2));
+        Double imc;
+        try {
+            imc = peso/(Math.pow(estatura,2));
+        }catch (Exception e){
+            throw new ConflictoException("No seas perro no puede medir y pesar eso ;)");
+        }
+        return imc;
     }
 
     private static String calcularNumeroExpediente(String telefono){
@@ -153,6 +158,8 @@ public class Paciente {
                 .apellidoPaterno(apellidoPaterno)
                 .apellidoMaterno(apellidoMaterno)
                 .edad(edad)
+                .email(email)
+                .estadoRegistro(EstadoRegistro.ACTIVO)
                 .peso(peso)
                 .estatura(estatura)
                 .telefono(telefono)
