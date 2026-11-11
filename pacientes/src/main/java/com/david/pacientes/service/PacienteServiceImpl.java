@@ -38,8 +38,8 @@ public class PacienteServiceImpl implements PacienteService{
     @Override
     public List<PacienteResponse> lista() {
         log.info("Obteniendo listado de pacientes...");
-
         return pacienteRepository.findAll().stream()
+                .filter(paciente -> paciente.getEstadoRegistro().equals(EstadoRegistro.ACTIVO))
                 .map(pacienteMapper::entidadAResponse)
                 .toList();
     }
