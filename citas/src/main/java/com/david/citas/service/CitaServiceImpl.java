@@ -37,9 +37,6 @@ public class CitaServiceImpl implements CitaService{
     private final List<EstadoCita> ESTADOS_ACTIVOS_INVALIDOS =
             List.of(CONFIRMADA, EN_CURSO);
 
-    private final List<EstadoCita> ESTADO_PACIENTE_INVALIDO =
-            List.of(CONFIRMADA,EN_CURSO, PENDIENTE);
-
 
     @Override
     @Transactional(readOnly = true)
@@ -104,8 +101,13 @@ public class CitaServiceImpl implements CitaService{
 
         pacienteTieneCitasAsignadas(paciente.id());
 
-        validarMedicoActivoDisponible(medico);
 
+        //TODO si el medico no cambia debe comprobar que el medico id sea el mismo del id del nuevo sin importar la disponibilidad
+        //si la cita cambia de médico le damos disponibilidad al médico que ya no va a atender
+        if(cita.getIdMedico()!=request.idMedico()) {
+            validarMedicoActivoDisponible(medico);
+            actualizarDisponibilidadMedico(cita.getIdMedico(), DisponibilidadMedico.DISPONIBLE.getCodigo());
+        }
         log.info("Actualizando cita con id: {}", id);
 
         cita.actualizar(
@@ -116,7 +118,7 @@ public class CitaServiceImpl implements CitaService{
 
         citaRepository.saveAndFlush(cita);
 
-        log.info("Cita actualizada");
+        log.info("Cita actualizada: {} ",cita);
 
         cambiarDisponibilidadMedicoSegunEstadoCita(medico.id(), cita.getEstadoCita());
 
@@ -174,14 +176,14 @@ public class CitaServiceImpl implements CitaService{
     @Override
     @Transactional(readOnly = true)
     public void pacienteTieneCitasAsignadas(Long idPaciente) {
-        log.info("Validando si el paciente tiene una cita activa con los estados: {}");
+        log.info("Validando si el paciente tiene una cita activa con los estados: {}",ESTADOS_ACTIVOS_INVALIDOS);
 
         if (citaRepository.existsByIdPacienteAndEstadoRegistroAndEstadoCitaIn(
                 idPaciente,
                 EstadoRegistro.ACTIVO,
-                ESTADO_PACIENTE_INVALIDO))
+                ESTADOS_ACTIVOS_INVALIDOS))
             throw new ConflictoException("No se puede modificar o eliminar el paciente ya que" +
-                    "tiene citas en estado: "+ ESTADO_PACIENTE_INVALIDO);
+                    "tiene citas en estado: "+ ESTADOS_ACTIVOS_INVALIDOS);
     }
 
     private Cita obtenerCita(Long id){
@@ -196,6 +198,7 @@ public class CitaServiceImpl implements CitaService{
     private MedicoResponse obtenerMedicoActivo(Long id){
 
         log.info("Buscando médico activo con id {} en el servicio remoto", id);
+
         return medicoClient.obtenerMedicoActivoPorId(id);
     }
 
@@ -213,7 +216,7 @@ public class CitaServiceImpl implements CitaService{
 
     private void actualizarDisponibilidadMedico(Long idMedico , Long idDisponibilidad){
 
-        log.info("Actualizando disponibilidad del médico en el servicio remoto...");
+        log.info("Actualizando disponibilidad del médico {} en el servicio remoto...",idMedico);
 
         medicoClient.actualizarDisponibilidadMedico(idMedico, idDisponibilidad);
 
@@ -247,4 +250,6 @@ public class CitaServiceImpl implements CitaService{
                         actualizarDisponibilidadMedico(idMedico, DisponibilidadMedico.EN_CONSULTA.getCodigo());
             }
     }
+
+
 }

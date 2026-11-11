@@ -22,4 +22,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     boolean existsByIdPacienteAndEstadoRegistroAndEstadoCitaIn(
             Long idPaciente, EstadoRegistro estadoRegistro, List<EstadoCita> estadoCitas);
+
+    boolean existsByIdMedicoAndIdNot(Long idMedico, Long idCita);
 }

@@ -114,12 +114,10 @@ public class Cita {
 
         validarDatos(idPaciente,idMedico,sintomas,fechaCita);
 
-        Cita.builder()
-                .idPaciente(idPaciente)
-                .idMedico(idMedico)
-                .sintomas(sintomas)
-                .fechaCita(fechaCita)
-                .build();
+        this.idPaciente=idPaciente;
+        this.idMedico=idMedico;
+        this.sintomas=sintomas;
+        this.fechaCita=fechaCita;
     }
 
     public void actualizarEstadoCita(EstadoCita nuevoEstado){
