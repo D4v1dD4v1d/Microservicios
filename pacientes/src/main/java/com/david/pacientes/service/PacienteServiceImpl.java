@@ -146,7 +146,7 @@ public class PacienteServiceImpl implements PacienteService{
     }
 
     private void validarPacienteTieneCitasAgendadas(Long idPaciente){
-
+        //TODO VALIDAR SI LAS CITAS SON CONFIRMADA O EN CURSO NO SE PUEDE ELIMINAR, LAS DEMÁS SI
         log.info("Validando si el paciente con id {} tiene citas asignadas en servicio remoto...", idPaciente);
 
         citaClient.pacienteTieneCitasAsignadas(idPaciente);
