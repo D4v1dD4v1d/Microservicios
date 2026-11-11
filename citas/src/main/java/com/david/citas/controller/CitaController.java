@@ -39,7 +39,7 @@ public class CitaController extends CrudController<CitaRequest, CitaResponse, Ci
     }
 
     @ApiResponse(responseCode = "204", description = "El médico no tiene citas asignadas")
-    @ApiResponse(responseCode = "409", description = "Médico tiene citas asignadas y no puede modificar ni eliminar",
+    @ApiResponse(responseCode = "409", description = "Médico tiene citas asignadas y no se puede modificar ni eliminar",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemaDoc.class)))
     @GetMapping("/id-medico/{idMedico}/citas-asignadas")
@@ -47,6 +47,18 @@ public class CitaController extends CrudController<CitaRequest, CitaResponse, Ci
             @Parameter(description = "Id del médico", example = "1")
             @PathVariable @Positive(message = "El idMedico debe ser positivo") Long idMedico){
         service.medicoTieneCitasAsignadas(idMedico);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponse(responseCode = "204", description = "El paciente no tiene citas asignadas")
+    @ApiResponse(responseCode = "409", description = "Paciente tiene citas asignadas y no se puede modificar ni eliminar",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    @GetMapping("/id-paciente/{idPaciente}/citas-asignadas")
+    public ResponseEntity<Void> pacienteTieneCitasAsignadas(
+            @Parameter(description = "Id del paciente", example = "1")
+            @PathVariable @Positive(message = "El idPaciente debe ser positivo") Long idPaciente){
+        service.pacienteTieneCitasAsignadas(idPaciente);
         return ResponseEntity.noContent().build();
     }
 

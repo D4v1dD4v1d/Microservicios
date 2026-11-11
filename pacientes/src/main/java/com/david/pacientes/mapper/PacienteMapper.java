@@ -5,10 +5,12 @@ import com.david.commons.dto.pacientes.PacienteResponse;
 import com.david.commons.mapper.CommonMapper;
 import com.david.pacientes.entitiy.Paciente;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PacienteMapper implements CommonMapper<PacienteRequest, Paciente, PacienteResponse> {
     @Override
     public Paciente requestAEntidad(PacienteRequest request) {
