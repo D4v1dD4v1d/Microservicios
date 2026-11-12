@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.david.citas.enums.EstadoCita.*;
 
@@ -106,10 +107,11 @@ public class CitaServiceImpl implements CitaService{
 
 
         //si la cita cambia de médico le damos disponibilidad al médico que ya no va a atender
-        if(cita.getIdMedico()!=request.idMedico()) {
+        if(!Objects.equals(cita.getIdMedico(), request.idMedico())) {
             validarMedicoActivoDisponible(medico);
             actualizarDisponibilidadMedico(cita.getIdMedico(), DisponibilidadMedico.DISPONIBLE.getCodigo());
         }
+
         log.info("Actualizando cita con id: {}", id);
 
         cita.actualizar(
